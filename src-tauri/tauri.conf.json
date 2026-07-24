@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Problem Journal",
+  "mainBinaryName": "problem-journal",
+  "version": "0.1.0",
+  "identifier": "com.patel.problem-journal",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Problem Journal",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 560,
+        "backgroundColor": "#1E1E1E"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "publisher": "Problem Journal",
+    "copyright": "Copyright © 2026 Problem Journal",
+    "shortDescription": "Every problem. Every pattern. Every insight.",
+    "longDescription": "A personal, offline desktop app for recording DSA problem-solving sessions — problem details, patterns, thinking, mistakes, takeaways, and code, all searchable in one place.",
+    "category": "DeveloperTool",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "compression": "lzma",
+        "languages": ["English"],
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico",
+        "headerImage": "installer-assets/nsis-header.bmp",
+        "sidebarImage": "installer-assets/nsis-sidebar.bmp"
+      },
+      "wix": {
+        "upgradeCode": "c8b2e78c-d662-54bd-94bb-38ceb5bd0971",
+        "language": "en-US",
+        "bannerPath": "installer-assets/wix-banner.bmp",
+        "dialogImagePath": "installer-assets/wix-dialog.bmp"
+      }
+    }
+  }
+}
