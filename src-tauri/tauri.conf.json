@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "msi"],
+    "targets": "all",
     "publisher": "Problem Journal",
     "copyright": "Copyright © 2026 Problem Journal",
     "shortDescription": "Every problem. Every pattern. Every insight.",

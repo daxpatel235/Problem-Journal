@@ -17,6 +17,7 @@ pub struct ProblemRow {
     pub thinking: String,
     pub mistakes: String,
     pub takeaways: String,
+    pub tags: String,
     pub code: String,
     pub language: String,
     pub is_deleted: i64,
@@ -39,6 +40,7 @@ pub struct Problem {
     pub thinking: Vec<String>,
     pub mistakes: Vec<String>,
     pub takeaways: Vec<String>,
+    pub tags: Vec<String>,
     pub code: String,
     pub language: String,
     pub is_deleted: bool,
@@ -61,6 +63,7 @@ impl From<ProblemRow> for Problem {
             thinking: utils::json_array_from_string(&row.thinking),
             mistakes: utils::json_array_from_string(&row.mistakes),
             takeaways: utils::json_array_from_string(&row.takeaways),
+            tags: utils::json_array_from_string(&row.tags),
             code: row.code,
             language: row.language,
             is_deleted: row.is_deleted != 0,
@@ -78,6 +81,7 @@ pub struct ProblemSummaryRow {
     pub topic: String,
     pub pattern_category: String,
     pub favorite: i64,
+    pub tags: String,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -91,6 +95,7 @@ pub struct ProblemSummary {
     pub topic: String,
     pub pattern_category: String,
     pub favorite: bool,
+    pub tags: Vec<String>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -104,6 +109,7 @@ impl From<ProblemSummaryRow> for ProblemSummary {
             topic: row.topic,
             pattern_category: row.pattern_category,
             favorite: row.favorite != 0,
+            tags: utils::json_array_from_string(&row.tags),
             created_at: row.created_at,
             updated_at: row.updated_at,
         }
@@ -124,6 +130,7 @@ pub struct CreateProblem {
     pub thinking: Vec<String>,
     pub mistakes: Vec<String>,
     pub takeaways: Vec<String>,
+    pub tags: Vec<String>,
     pub code: String,
     pub language: String,
 }
@@ -143,6 +150,7 @@ pub struct UpdateProblem {
     pub thinking: Vec<String>,
     pub mistakes: Vec<String>,
     pub takeaways: Vec<String>,
+    pub tags: Vec<String>,
     pub code: String,
     pub language: String,
 }
@@ -154,6 +162,7 @@ pub struct ProblemFilters {
     pub difficulty: Option<String>,
     pub topic: Option<String>,
     pub pattern_category: Option<String>,
+    pub tag: Option<String>,
     pub favorites_only: Option<bool>,
     pub date_from: Option<String>,
     pub date_to: Option<String>,

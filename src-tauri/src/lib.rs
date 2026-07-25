@@ -103,6 +103,7 @@ pub fn run() {
             commands::problem_commands::restore_problem,
             commands::problem_commands::permanent_delete_problem,
             commands::problem_commands::duplicate_problem,
+            commands::problem_commands::import_problems_json,
             commands::settings_commands::get_setting,
             commands::settings_commands::set_setting,
             commands::settings_commands::get_all_settings,
