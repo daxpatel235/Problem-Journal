@@ -18,9 +18,11 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 - **macOS** — `.dmg`
 - **Linux** — `.AppImage` or `.deb`
 
-> **Heads-up:** the Windows and macOS installers are currently **unsigned**, so your OS
-> may warn about an "unknown publisher." This is expected for a free, open-source app
-> without a paid code-signing certificate — see the steps below to install safely.
+> ⚠️ **Before you install — please read.** These installers are **not code-signed**
+> (a signing certificate costs money; this is a free, open-source project). Because of
+> that, Windows and macOS will show a one-time **"unknown publisher"** warning that you
+> have to **allow** manually. The warning does **not** mean the app is unsafe — it only
+> means the file isn't signed. Follow the steps for your OS below to allow it.
 
 ### Installing past the "unknown publisher" warning
 
@@ -35,6 +37,15 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 1. Open the `.dmg` and drag the app to Applications.
 2. **Right-click** (or Control-click) the app → **Open** → **Open** again on the prompt.
    (Doing it this way once tells macOS to trust it; normal double-click works afterward.)
+
+**Linux:**
+
+- **`.deb`** — install with `sudo dpkg -i Problem.Journal_0.1.0_amd64.deb` (no warning).
+- **`.AppImage`** — mark it executable first, then run it:
+  ```bash
+  chmod +x Problem.Journal_0.1.0_amd64.AppImage
+  ./Problem.Journal_0.1.0_amd64.AppImage
+  ```
 
 ### Why you can trust it
 
@@ -115,6 +126,22 @@ Problem Journal stores everything locally in a single SQLite file:
 ```
 
 Backups are written to `~/.problem-journal/backups/` by default (configurable in Settings).
+
+### Troubleshooting: app closes immediately on launch
+
+If you ran a **pre-release/dev build** in the past, you may have an older database whose
+schema no longer matches this version, which causes the app to close on startup. Fix it by
+moving the old database aside (a fresh one is created automatically):
+
+```bash
+# Windows (PowerShell)
+Rename-Item "$HOME\.problem-journal\problem_journal.db" "problem_journal.db.bak"
+
+# macOS / Linux
+mv ~/.problem-journal/problem_journal.db ~/.problem-journal/problem_journal.db.bak
+```
+
+This does **not** affect fresh installs — new users never hit it.
 
 ## Keyboard Shortcuts
 
