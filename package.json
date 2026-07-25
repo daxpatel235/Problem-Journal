@@ -3,11 +3,38 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "description": "A personal, offline, developer-grade desktop app for recording DSA problem-solving sessions — built with Tauri 2, Rust, React 19, and SQLite.",
+  "author": "Dax Patel",
+  "license": "MIT",
+  "homepage": "https://github.com/daxpatel235/Problem-Journal#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daxpatel235/Problem-Journal.git"
+  },
+  "bugs": {
+    "url": "https://github.com/daxpatel235/Problem-Journal/issues"
+  },
+  "keywords": [
+    "tauri",
+    "dsa",
+    "leetcode",
+    "journal",
+    "desktop",
+    "offline",
+    "react",
+    "rust",
+    "sqlite"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -32,13 +59,20 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tauri-apps/cli": "^2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
     "tailwindcss": "^4.3.3",
     "typescript": "~5.8.3",
+    "typescript-eslint": "^8.19.0",
     "vite": "^7.0.4"
   }
 }
