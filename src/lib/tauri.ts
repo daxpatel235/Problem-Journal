@@ -25,6 +25,8 @@ export const api = {
     permanentDelete: (id: string) =>
       invoke<void>("permanent_delete_problem", { id }),
     duplicate: (id: string) => invoke<Problem>("duplicate_problem", { id }),
+    importJson: (json: string) =>
+      invoke<number>("import_problems_json", { json }),
   },
   settings: {
     get: (key: string) => invoke<string | null>("get_setting", { key }),

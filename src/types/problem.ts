@@ -15,6 +15,7 @@ export interface Problem {
   thinking: string[];
   mistakes: string[];
   takeaways: string[];
+  tags: string[];
   code: string;
   language: string;
   isDeleted: boolean;
@@ -29,6 +30,7 @@ export interface ProblemSummary {
   topic: string;
   patternCategory: string;
   favorite: boolean;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -45,6 +47,7 @@ export interface ProblemFormData {
   thinking: string[];
   mistakes: string[];
   takeaways: string[];
+  tags: string[];
   code: string;
   language: string;
 }
@@ -60,6 +63,7 @@ export interface ProblemFilters {
   difficulty?: string;
   topic?: string;
   patternCategory?: string;
+  tag?: string;
   favoritesOnly?: boolean;
   dateFrom?: string;
   dateTo?: string;
@@ -78,6 +82,7 @@ export const EMPTY_PROBLEM_FORM: ProblemFormData = {
   thinking: [],
   mistakes: [],
   takeaways: [],
+  tags: [],
   code: "",
   language: "python",
 };
