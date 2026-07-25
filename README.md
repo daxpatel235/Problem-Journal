@@ -2,7 +2,32 @@
 
 **Every problem. Every pattern. Every insight.**
 
+[![CI](https://github.com/daxpatel235/Problem-Journal/actions/workflows/ci.yml/badge.svg)](https://github.com/daxpatel235/Problem-Journal/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/daxpatel235/Problem-Journal?include_prereleases)](https://github.com/daxpatel235/Problem-Journal/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
 A personal, offline, developer-grade desktop app for recording DSA problem-solving sessions — built with [Tauri 2](https://tauri.app/), Rust, React 19, and SQLite. Open it, log what you just solved (problem details, pattern, thinking, mistakes, takeaways, code), and close it. No accounts, no sync, no SaaS — just a fast, local knowledge base built for long-term recall.
+
+> 🔒 **100% offline.** No accounts, no sync, no telemetry — your data never leaves your machine.
+
+## Download
+
+Grab the installer for your OS from the [**latest release**](https://github.com/daxpatel235/Problem-Journal/releases/latest):
+
+- **Windows** — `.exe` (NSIS) or `.msi`
+- **macOS** — `.dmg`
+- **Linux** — `.AppImage` or `.deb`
+
+> **Heads-up:** the Windows and macOS installers are currently **unsigned**, so your OS
+> may warn about an "unknown publisher" (Windows SmartScreen) or Gatekeeper. On Windows,
+> click **More info → Run anyway**; on macOS, right-click the app → **Open**. This is
+> expected for an open-source app without a paid code-signing certificate. Prefer to build
+> it yourself? See [Development](#development).
+
+## Screenshots
+
+> _Screenshots coming soon._ Add images under [`docs/`](./docs) and reference them here,
+> e.g. `![Main window](docs/screenshot-main.png)`.
 
 ## Why
 
@@ -73,10 +98,18 @@ Backups are written to `~/.problem-journal/backups/` by default (configurable in
 |---|---|
 | `Ctrl+N` | New problem |
 | `Ctrl+S` | Save |
+| `Ctrl+K` | Command palette |
 | `Ctrl+F` | Search |
 | `Ctrl+D` | Duplicate problem |
 | `Delete` | Move to trash |
 | `Ctrl +` / `Ctrl -` / `Ctrl 0` | Zoom in / out / reset |
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for setup and the
+dev workflow, and please follow the [Code of Conduct](./CODE_OF_CONDUCT.md). Found a
+security issue? See [SECURITY.md](./SECURITY.md). Notable changes are tracked in the
+[CHANGELOG](./CHANGELOG.md).
 
 ## License
 
