@@ -19,10 +19,34 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 - **Linux** — `.AppImage` or `.deb`
 
 > **Heads-up:** the Windows and macOS installers are currently **unsigned**, so your OS
-> may warn about an "unknown publisher" (Windows SmartScreen) or Gatekeeper. On Windows,
-> click **More info → Run anyway**; on macOS, right-click the app → **Open**. This is
-> expected for an open-source app without a paid code-signing certificate. Prefer to build
-> it yourself? See [Development](#development).
+> may warn about an "unknown publisher." This is expected for a free, open-source app
+> without a paid code-signing certificate — see the steps below to install safely.
+
+### Installing past the "unknown publisher" warning
+
+**Windows (SmartScreen):**
+
+1. Double-click `Problem.Journal_0.1.0_x64-setup.exe`.
+2. On the blue "Windows protected your PC" dialog, click **More info**.
+3. Click the **Run anyway** button that appears, then continue the installer.
+
+**macOS (Gatekeeper):**
+
+1. Open the `.dmg` and drag the app to Applications.
+2. **Right-click** (or Control-click) the app → **Open** → **Open** again on the prompt.
+   (Doing it this way once tells macOS to trust it; normal double-click works afterward.)
+
+### Why you can trust it
+
+- **It's fully open source** — every line that goes into these installers is in this repo.
+- **The installers are built by GitHub Actions** directly from the tagged source
+  ([release workflow](.github/workflows/release.yml)), not uploaded by hand — so the
+  binary matches the public code.
+- **Prefer zero trust in prebuilt binaries?** Build it yourself from source — see
+  [Development](#development). It's the same result.
+
+The "unknown publisher" warning only means the file isn't signed with a paid certificate;
+it is **not** a detection that the app is harmful.
 
 ## Screenshots
 
