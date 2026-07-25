@@ -11,6 +11,10 @@ jobs:
   release:
     permissions:
       contents: write
+    env:
+      # Tauri's beforeBuildCommand runs `npm run build` (tsc + vite); the
+      # Monaco-heavy bundle OOMs Node's default heap on the macOS runner.
+      NODE_OPTIONS: --max-old-space-size=4096
     strategy:
       fail-fast: false
       matrix:
