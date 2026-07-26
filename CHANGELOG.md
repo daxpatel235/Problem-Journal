@@ -6,6 +6,10 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [0.2.0] — 2026-07-26
+
 ### Added
 
 - **Tags** — free-form, multi-value tags (e.g. companies like Google/Amazon) on each
@@ -23,6 +27,25 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **"New" opened the previous problem instead of a blank one.** Clicking **New**
+  (or pressing `Ctrl+N`, or using the command palette) appeared to do nothing: the
+  editor kept showing the problem you had just been editing, so there was no way to
+  start a fresh entry without restarting the app.
+
+  _Cause:_ the "reopen the problem you had open last time" logic in `src/App.tsx` was
+  written as a reactive effect that watched `selectedId`, rather than as a one-time
+  restore at startup. Starting a new problem sets `selectedId` to `null` (there's no
+  saved row yet), which re-triggered that effect; it then compared the remembered
+  `lastOpenedProblemId` against `null`, decided they differed, and re-selected the old
+  problem — overwriting the blank draft milliseconds after it appeared.
+
+  _Fix:_ the restore now runs at most once per app launch, gated on settings having
+  finished loading, and it yields if a problem is already open — so whatever you choose
+  during a session stays open. Your last problem is still reopened on the next launch.
+
+- **Deleting the open problem brought it straight back.** Same root cause: moving a
+  problem to trash clears the selection, which re-triggered the restore effect and
+  reloaded the problem you had just deleted.
 - Edits are no longer lost when saving while typing, switching problems, or closing the
   app (pending changes are flushed on close).
 - Removed a duplicate favorite control and tightened alignment in the problem editor.
@@ -33,3 +56,7 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Initial version: timeline, structured editor, Monaco code editor, full-text search,
   favorites/trash/duplication, export (Markdown/JSON/PDF), and backups.
+
+[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/daxpatel235/Problem-Journal/releases/tag/v0.1.0
