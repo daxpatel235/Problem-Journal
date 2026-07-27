@@ -35,7 +35,8 @@ export function TimelinePanel() {
     // re-run when the user types, using the latest filters via closure at fire time.
   }, [searchInput]);
 
-  const groups = groupProblemsByDate(problems);
+  const sort = filters.sort ?? "newest";
+  const groups = groupProblemsByDate(problems, sort);
   const hasActiveFilters = Object.values(filters).some(
     (v) => v !== undefined && v !== "" && v !== false,
   );
@@ -105,7 +106,10 @@ export function TimelinePanel() {
           <div className="flex flex-col gap-3">
             {groups.map((group) => (
               <TimelineGroup
-                key={group.label}
+                // Keying on the sort remounts the groups when the order
+                // changes, so their default collapsed state is re-applied
+                // instead of carrying over from the previous ordering.
+                key={`${sort}:${group.label}`}
                 group={group}
                 selectedId={selectedId}
                 onSelect={(id) => void selectProblem(id)}
