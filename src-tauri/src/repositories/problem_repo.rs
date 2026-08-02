@@ -18,9 +18,10 @@ pub async fn create(pool: &DbPool, input: CreateProblem) -> Result<Problem, sqlx
     sqlx::query(
         r#"
         INSERT INTO problems (
-            id, problem_name, difficulty, topic, platform, url, pattern_category, favorite,
-            pattern, thinking, mistakes, takeaways, tags, code, language, is_deleted, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+            id, problem_name, difficulty, topic, platform, url, problem_statement, examples, pattern_category, favorite,
+            brute_force, brute_force_time_complexity, brute_force_space_complexity,
+            pattern, thinking, time_complexity, space_complexity, mistakes, takeaways, tags, code, language, is_deleted, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
         "#,
     )
     .bind(&id)
@@ -29,10 +30,17 @@ pub async fn create(pool: &DbPool, input: CreateProblem) -> Result<Problem, sqlx
     .bind(&input.topic)
     .bind(&input.platform)
     .bind(&input.url)
+    .bind(&input.problem_statement)
+    .bind(utils::json_array_to_string(&input.examples))
     .bind(&input.pattern_category)
     .bind(input.favorite as i64)
+    .bind(utils::json_array_to_string(&input.brute_force))
+    .bind(&input.brute_force_time_complexity)
+    .bind(&input.brute_force_space_complexity)
     .bind(utils::json_array_to_string(&input.pattern))
     .bind(utils::json_array_to_string(&input.thinking))
+    .bind(&input.time_complexity)
+    .bind(&input.space_complexity)
     .bind(utils::json_array_to_string(&input.mistakes))
     .bind(utils::json_array_to_string(&input.takeaways))
     .bind(utils::json_array_to_string(&input.tags))
@@ -54,8 +62,9 @@ pub async fn update(pool: &DbPool, input: UpdateProblem) -> Result<Problem, sqlx
     sqlx::query(
         r#"
         UPDATE problems SET
-            problem_name = ?, difficulty = ?, topic = ?, platform = ?, url = ?,
-            pattern_category = ?, favorite = ?, pattern = ?, thinking = ?, mistakes = ?,
+            problem_name = ?, difficulty = ?, topic = ?, platform = ?, url = ?, problem_statement = ?, examples = ?,
+            pattern_category = ?, favorite = ?, brute_force = ?, brute_force_time_complexity = ?, brute_force_space_complexity = ?,
+            pattern = ?, thinking = ?, time_complexity = ?, space_complexity = ?, mistakes = ?,
             takeaways = ?, tags = ?, code = ?, language = ?, updated_at = ?
         WHERE id = ? AND is_deleted = 0
         "#,
@@ -65,10 +74,17 @@ pub async fn update(pool: &DbPool, input: UpdateProblem) -> Result<Problem, sqlx
     .bind(&input.topic)
     .bind(&input.platform)
     .bind(&input.url)
+    .bind(&input.problem_statement)
+    .bind(utils::json_array_to_string(&input.examples))
     .bind(&input.pattern_category)
     .bind(input.favorite as i64)
+    .bind(utils::json_array_to_string(&input.brute_force))
+    .bind(&input.brute_force_time_complexity)
+    .bind(&input.brute_force_space_complexity)
     .bind(utils::json_array_to_string(&input.pattern))
     .bind(utils::json_array_to_string(&input.thinking))
+    .bind(&input.time_complexity)
+    .bind(&input.space_complexity)
     .bind(utils::json_array_to_string(&input.mistakes))
     .bind(utils::json_array_to_string(&input.takeaways))
     .bind(utils::json_array_to_string(&input.tags))
@@ -247,10 +263,17 @@ pub async fn duplicate(pool: &DbPool, id: &str) -> Result<Problem, sqlx::Error> 
             topic: original.topic,
             platform: original.platform,
             url: original.url,
+            problem_statement: original.problem_statement,
+            examples: original.examples,
             pattern_category: original.pattern_category,
             favorite: false,
+            brute_force: original.brute_force,
+            brute_force_time_complexity: original.brute_force_time_complexity,
+            brute_force_space_complexity: original.brute_force_space_complexity,
             pattern: original.pattern,
             thinking: original.thinking,
+            time_complexity: original.time_complexity,
+            space_complexity: original.space_complexity,
             mistakes: original.mistakes,
             takeaways: original.takeaways,
             tags: original.tags,

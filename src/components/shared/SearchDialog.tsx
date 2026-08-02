@@ -54,7 +54,7 @@ export function SearchDialog() {
       open={searchOpen}
       onOpenChange={(open: boolean) => !open && closeSearch()}
       title="Search Problems"
-      description="Search across problem names, topics, patterns, thinking, mistakes, and takeaways"
+      description="Search across problem names, topics, patterns, brute force notes, thinking, mistakes, and takeaways"
     >
       <CommandInput
         value={query}

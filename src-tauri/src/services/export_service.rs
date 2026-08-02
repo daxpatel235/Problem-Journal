@@ -31,8 +31,16 @@ pub fn export_markdown(problem: &Problem) -> String {
         - **Favorite:** {favorite}\n\
         - **Created:** {created_at}\n\
         - **Updated:** {updated_at}\n\n\
+        ## Problem Statement\n\n{problem_statement}\n\n\
+        ## Examples\n\n{examples}\n\n\
+        ## Brute Force\n\n{brute_force}\n\n\
         ## Pattern\n\n{pattern}\n\n\
         ## Thinking\n\n{thinking}\n\n\
+        ## Complexity\n\n\
+        - **Brute Force Time:** {bf_time}\n\
+        - **Brute Force Space:** {bf_space}\n\
+        - **Optimal Time:** {time}\n\
+        - **Optimal Space:** {space}\n\n\
         ## Mistakes\n\n{mistakes}\n\n\
         ## Takeaways\n\n{takeaways}\n\n\
         ## Code ({language})\n\n```{language}\n{code}\n```\n",
@@ -46,8 +54,31 @@ pub fn export_markdown(problem: &Problem) -> String {
         favorite = if problem.favorite { "Yes" } else { "No" },
         created_at = problem.created_at,
         updated_at = problem.updated_at,
+        problem_statement = if problem.problem_statement.is_empty() { "_Not provided._".to_string() } else { problem.problem_statement.clone() },
+        examples = numbered_list(&problem.examples),
+        brute_force = numbered_list(&problem.brute_force),
+        bf_time = if problem.brute_force_time_complexity.is_empty() {
+            "—".to_string()
+        } else {
+            problem.brute_force_time_complexity.clone()
+        },
+        bf_space = if problem.brute_force_space_complexity.is_empty() {
+            "—".to_string()
+        } else {
+            problem.brute_force_space_complexity.clone()
+        },
         pattern = numbered_list(&problem.pattern),
         thinking = numbered_list(&problem.thinking),
+        time = if problem.time_complexity.is_empty() {
+            "—".to_string()
+        } else {
+            problem.time_complexity.clone()
+        },
+        space = if problem.space_complexity.is_empty() {
+            "—".to_string()
+        } else {
+            problem.space_complexity.clone()
+        },
         mistakes = numbered_list(&problem.mistakes),
         takeaways = numbered_list(&problem.takeaways),
         language = problem.language,
@@ -95,8 +126,14 @@ pre {{ background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; o
 <h1>{name}</h1>
 <p class="meta">{difficulty} &middot; {topic} &middot; {platform} &middot; {pattern_category}</p>
 <p class="meta">Tags: {tags}</p>
+<h2>Problem Statement</h2><p>{problem_statement}</p>
+<h2>Examples</h2>{examples}
+<h2>Brute Force</h2>{brute_force}
 <h2>Pattern</h2>{pattern}
 <h2>Thinking</h2>{thinking}
+<h2>Complexity</h2>
+<p class="meta">Brute Force — Time: {bf_time} &middot; Space: {bf_space}</p>
+<p class="meta">Optimal — Time: {time} &middot; Space: {space}</p>
 <h2>Mistakes</h2>{mistakes}
 <h2>Takeaways</h2>{takeaways}
 <h2>Code ({language})</h2>
@@ -108,8 +145,31 @@ pre {{ background: #1e1e1e; color: #d4d4d4; padding: 1rem; border-radius: 6px; o
         platform = html_escape(&problem.platform),
         pattern_category = html_escape(&problem.pattern_category),
         tags = html_escape(&inline_list(&problem.tags)),
+        problem_statement = if problem.problem_statement.is_empty() { "<p class=\"muted\">Not provided.</p>".to_string() } else { format!("<p>{}</p>", html_escape(&problem.problem_statement)) },
+        examples = html_list(&problem.examples),
+        brute_force = html_list(&problem.brute_force),
+        bf_time = html_escape(if problem.brute_force_time_complexity.is_empty() {
+            "—"
+        } else {
+            &problem.brute_force_time_complexity
+        }),
+        bf_space = html_escape(if problem.brute_force_space_complexity.is_empty() {
+            "—"
+        } else {
+            &problem.brute_force_space_complexity
+        }),
         pattern = html_list(&problem.pattern),
         thinking = html_list(&problem.thinking),
+        time = html_escape(if problem.time_complexity.is_empty() {
+            "—"
+        } else {
+            &problem.time_complexity
+        }),
+        space = html_escape(if problem.space_complexity.is_empty() {
+            "—"
+        } else {
+            &problem.space_complexity
+        }),
         mistakes = html_list(&problem.mistakes),
         takeaways = html_list(&problem.takeaways),
         language = html_escape(&problem.language),

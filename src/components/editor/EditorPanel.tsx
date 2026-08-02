@@ -19,7 +19,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ProblemInfo } from "@/components/editor/ProblemInfo";
+import { ProblemStatement } from "@/components/editor/ProblemStatement";
+import { ExamplesList } from "@/components/editor/ExamplesList";
 import { DynamicList } from "@/components/editor/DynamicList";
+import { ComplexityFields } from "@/components/editor/ComplexityFields";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { TagInput } from "@/components/editor/TagInput";
 import { COMPANY_PRESETS } from "@/lib/presets";
@@ -220,6 +223,19 @@ export function EditorPanel() {
 
       <div className="flex flex-1 flex-col overflow-y-auto">
         <ProblemInfo />
+        <ProblemStatement
+          statement={problem.problemStatement}
+          onChange={(statement) => updateDraft({ problemStatement: statement })}
+        />
+        <ExamplesList
+          items={problem.examples}
+          onChange={(items) => updateDraft({ examples: items })}
+        />
+        <DynamicList
+          title="Brute Force"
+          items={problem.bruteForce}
+          onChange={(items) => updateDraft({ bruteForce: items })}
+        />
         <DynamicList
           title="Pattern"
           items={problem.pattern}
@@ -229,6 +245,13 @@ export function EditorPanel() {
           title="Thinking"
           items={problem.thinking}
           onChange={(items) => updateDraft({ thinking: items })}
+        />
+        <ComplexityFields
+          bruteForceTimeComplexity={problem.bruteForceTimeComplexity}
+          bruteForceSpaceComplexity={problem.bruteForceSpaceComplexity}
+          timeComplexity={problem.timeComplexity}
+          spaceComplexity={problem.spaceComplexity}
+          onChange={(patch) => updateDraft(patch)}
         />
         <DynamicList
           title="Mistakes"

@@ -9,10 +9,17 @@ export interface Problem {
   topic: string;
   platform: string;
   url: string;
+  problemStatement: string;
+  examples: string[];
   patternCategory: string;
   favorite: boolean;
+  bruteForce: string[];
+  bruteForceTimeComplexity: string;
+  bruteForceSpaceComplexity: string;
   pattern: string[];
   thinking: string[];
+  timeComplexity: string;
+  spaceComplexity: string;
   mistakes: string[];
   takeaways: string[];
   tags: string[];
@@ -41,10 +48,17 @@ export interface ProblemFormData {
   topic: string;
   platform: string;
   url: string;
+  problemStatement: string;
+  examples: string[];
   patternCategory: string;
   favorite: boolean;
+  bruteForce: string[];
+  bruteForceTimeComplexity: string;
+  bruteForceSpaceComplexity: string;
   pattern: string[];
   thinking: string[];
+  timeComplexity: string;
+  spaceComplexity: string;
   mistakes: string[];
   takeaways: string[];
   tags: string[];
@@ -76,10 +90,17 @@ export const EMPTY_PROBLEM_FORM: ProblemFormData = {
   topic: "",
   platform: "",
   url: "",
+  problemStatement: "",
+  examples: [],
   patternCategory: "",
   favorite: false,
+  bruteForce: [],
+  bruteForceTimeComplexity: "",
+  bruteForceSpaceComplexity: "",
   pattern: [],
   thinking: [],
+  timeComplexity: "",
+  spaceComplexity: "",
   mistakes: [],
   takeaways: [],
   tags: [],

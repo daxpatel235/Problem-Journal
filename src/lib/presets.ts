@@ -112,6 +112,18 @@ export const COMPANY_PRESETS = [
   "PayPal",
 ] as const;
 
+export const COMPLEXITY_PRESETS = [
+  "O(1)",
+  "O(log n)",
+  "O(sqrt(n))",
+  "O(n)",
+  "O(n log n)",
+  "O(n^2)",
+  "O(n^3)",
+  "O(2^n)",
+  "O(n!)",
+] as const;
+
 export const LANGUAGE_PRESETS = [
   { label: "Python", value: "python" },
   { label: "C++", value: "cpp" },
