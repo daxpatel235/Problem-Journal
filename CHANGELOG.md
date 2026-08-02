@@ -8,6 +8,22 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 _Nothing yet._
 
+## [0.3.0] — 2026-08-02
+
+### Added
+
+- **Problem Statement** — a free-form description field per problem, so the original
+  prompt is captured alongside your notes.
+- **Examples** — a reorderable list of example input/output cases, separate from the
+  problem statement.
+- **Brute Force** — a reorderable list capturing the naive approach, so you write it
+  down before jumping to the optimized solution.
+- **Complexity** — brute-force and optimal time/space complexity fields (with Big-O
+  autocomplete: O(1), O(log n), O(n), O(n log n), O(n²), O(n³), O(2ⁿ), O(n!), O(√n)),
+  so every entry records how the naive and optimized approaches actually compare.
+
+All four are full-text searchable and included in Markdown/PDF/JSON export.
+
 ## [0.2.1] — 2026-07-27
 
 ### Fixed
@@ -84,7 +100,8 @@ _Nothing yet._
 - Initial version: timeline, structured editor, Monaco code editor, full-text search,
   favorites/trash/duplication, export (Markdown/JSON/PDF), and backups.
 
-[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/daxpatel235/Problem-Journal/releases/tag/v0.1.0
