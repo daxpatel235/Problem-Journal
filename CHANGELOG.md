@@ -29,11 +29,6 @@ _Nothing yet._
   - The editor shows which folders a problem is in, with one-click add/remove.
 - Duplicating a problem puts the copy in the same folders as the original.
 
-### Changed
-
-- Windows releases now ship as an `.msi` installer only (the NSIS `.exe` setup is no
-  longer built).
-
 ## [0.3.0] — 2026-08-02
 
 ### Added

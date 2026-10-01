@@ -14,8 +14,8 @@ A personal, offline, developer-grade desktop app for recording DSA problem-solvi
 
 Grab the installer for your OS from the [**latest release**](https://github.com/daxpatel235/Problem-Journal/releases/latest):
 
-- **Windows** — `.msi`
-- **macOS** — `.dmg`
+- **Windows** — `.exe` setup or `.msi`
+- **macOS** — `.dmg` (Apple Silicon or Intel)
 - **Linux** — `.AppImage` or `.deb`
 
 > ⚠️ **Before you install — please read.** These installers are **not code-signed**
@@ -28,7 +28,7 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 
 **Windows (SmartScreen):**
 
-1. Double-click `Problem.Journal_0.4.0_x64_en-US.msi`.
+1. Double-click `Problem.Journal_0.4.0_x64-setup.exe` (or the `.msi` installer).
 2. On the blue "Windows protected your PC" dialog, click **More info**.
 3. Click the **Run anyway** button that appears, then continue the installer.
 
