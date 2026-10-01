@@ -1,5 +1,6 @@
 import {
   BarChart3Icon,
+  FolderTreeIcon,
   GraduationCapIcon,
   ListTreeIcon,
   SettingsIcon,
@@ -8,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProblemStore } from "@/stores/problemStore";
+import { useFolderStore } from "@/stores/folderStore";
 import { useUiStore } from "@/stores/uiStore";
 
 export function Sidebar() {
@@ -17,23 +19,57 @@ export function Sidebar() {
   const openTrash = useUiStore((s) => s.openTrash);
   const openStats = useUiStore((s) => s.openStats);
   const openReview = useUiStore((s) => s.openReview);
+  const view = useUiStore((s) => s.view);
+  const setView = useUiStore((s) => s.setView);
+  const focusOpen = useFolderStore((s) => s.focusOpen);
+  const closeProblem = useFolderStore((s) => s.closeProblem);
+  const openFolder = useFolderStore((s) => s.openFolder);
 
   const favoritesActive = filters.favoritesOnly === true;
+  const inFolders = view === "folders";
+
+  // Leaving the explorer keeps whatever problem was open, so the timeline
+  // view simply shows it in the editor.
+  function showTimeline(nextFilters: typeof filters) {
+    if (inFolders) {
+      if (focusOpen) void closeProblem();
+      setView("timeline");
+    }
+    void setFilters(nextFilters);
+  }
+
+  function showFolders() {
+    if (inFolders) {
+      // Clicking Folders again jumps back to the top level, like a home button.
+      if (focusOpen) void closeProblem();
+      void openFolder(null);
+      return;
+    }
+    setView("folders");
+    void openFolder(useFolderStore.getState().currentFolderId);
+  }
 
   const items = [
     {
       key: "problems",
       label: "All Problems",
       icon: ListTreeIcon,
-      active: !favoritesActive,
-      onClick: () => void setFilters({ ...filters, favoritesOnly: undefined }),
+      active: !inFolders && !favoritesActive,
+      onClick: () => showTimeline({ ...filters, favoritesOnly: undefined }),
     },
     {
       key: "favorites",
       label: "Favorites",
       icon: StarIcon,
-      active: favoritesActive,
-      onClick: () => void setFilters({ ...filters, favoritesOnly: true }),
+      active: !inFolders && favoritesActive,
+      onClick: () => showTimeline({ ...filters, favoritesOnly: true }),
+    },
+    {
+      key: "folders",
+      label: "Folders",
+      icon: FolderTreeIcon,
+      active: inFolders,
+      onClick: showFolders,
     },
     {
       key: "review",

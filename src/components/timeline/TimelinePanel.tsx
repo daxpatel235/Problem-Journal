@@ -50,7 +50,7 @@ export function TimelinePanel() {
     <div className="flex h-full flex-col border-r border-border bg-surface">
       <div className="flex items-center justify-between gap-2 p-2">
         <h2 className="px-1 text-sm font-semibold text-foreground">Problems</h2>
-        <Button type="button" size="sm" onClick={newProblem} className="gap-1">
+        <Button type="button" size="sm" onClick={() => void newProblem()} className="gap-1">
           <PlusIcon className="size-3.5" />
           New
         </Button>

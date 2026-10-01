@@ -8,7 +8,12 @@ interface ConfirmOptions {
   onConfirm: () => void;
 }
 
+/** Which main screen is showing: the timeline + editor split, or the folder explorer. */
+export type MainView = "timeline" | "folders";
+
 interface UiState {
+  view: MainView;
+  setView: (view: MainView) => void;
   searchOpen: boolean;
   settingsOpen: boolean;
   trashOpen: boolean;
@@ -33,6 +38,8 @@ interface UiState {
 }
 
 export const useUiStore = create<UiState>((set) => ({
+  view: "timeline",
+  setView: (view) => set({ view }),
   searchOpen: false,
   settingsOpen: false,
   trashOpen: false,

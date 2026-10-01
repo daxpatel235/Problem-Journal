@@ -40,6 +40,7 @@
     --color-success: var(--success);
     --color-warning: var(--warning);
     --color-selection: var(--selection);
+    --color-folder: var(--folder);
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
@@ -72,6 +73,7 @@
     --success: #4ec9b0;
     --warning: #d19a66;
     --selection: #264f78;
+    --folder: #dcb67a;
 
     --border: #3c3c3c;
     --input: #3c3c3c;
@@ -113,6 +115,7 @@
     --success: #257d3b;
     --warning: #a67302;
     --selection: #add6ff;
+    --folder: #b5862d;
 
     --border: #d4d4d4;
     --input: #cecece;

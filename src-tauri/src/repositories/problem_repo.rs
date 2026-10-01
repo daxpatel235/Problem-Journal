@@ -6,6 +6,7 @@ use crate::models::problem::{
     CreateProblem, Problem, ProblemFilters, ProblemRow, ProblemSummary, ProblemSummaryRow,
     UpdateProblem,
 };
+use crate::repositories::folder_repo;
 use crate::utils;
 
 const SUMMARY_COLUMNS: &str =
@@ -255,7 +256,7 @@ pub async fn duplicate(pool: &DbPool, id: &str) -> Result<Problem, sqlx::Error> 
         .await?
         .ok_or(sqlx::Error::RowNotFound)?;
 
-    create(
+    let copy = create(
         pool,
         CreateProblem {
             problem_name: format!("{} (copy)", original.problem_name),
@@ -281,5 +282,9 @@ pub async fn duplicate(pool: &DbPool, id: &str) -> Result<Problem, sqlx::Error> 
             language: original.language,
         },
     )
-    .await
+    .await?;
+
+    // Put the copy in the same folders as the original.
+    folder_repo::copy_links(pool, id, &copy.id).await?;
+    Ok(copy)
 }

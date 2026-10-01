@@ -7,6 +7,7 @@ import type {
   UpdateProblemInput,
 } from "@/types/problem";
 import type { BackupInfo, SettingsMap } from "@/types/settings";
+import type { Folder } from "@/types/folder";
 
 export const api = {
   problems: {
@@ -27,6 +28,25 @@ export const api = {
     duplicate: (id: string) => invoke<Problem>("duplicate_problem", { id }),
     importJson: (json: string) =>
       invoke<number>("import_problems_json", { json }),
+  },
+  folders: {
+    list: () => invoke<Folder[]>("list_folders"),
+    create: (name: string, parentId: string | null) =>
+      invoke<Folder>("create_folder", { name, parentId }),
+    rename: (id: string, name: string) => invoke<Folder>("rename_folder", { id, name }),
+    move: (id: string, parentId: string | null) =>
+      invoke<Folder>("move_folder", { id, parentId }),
+    delete: (id: string) => invoke<void>("delete_folder", { id }),
+    listProblems: (folderId: string) =>
+      invoke<ProblemSummary[]>("list_folder_problems", { folderId }),
+    addProblems: (folderId: string, problemIds: string[]) =>
+      invoke<number>("add_problems_to_folder", { folderId, problemIds }),
+    removeProblem: (folderId: string, problemId: string) =>
+      invoke<void>("remove_problem_from_folder", { folderId, problemId }),
+    moveProblem: (problemId: string, fromFolderId: string, toFolderId: string) =>
+      invoke<void>("move_problem_to_folder", { problemId, fromFolderId, toFolderId }),
+    folderIdsForProblem: (problemId: string) =>
+      invoke<string[]>("get_problem_folder_ids", { problemId }),
   },
   settings: {
     get: (key: string) => invoke<string | null>("get_setting", { key }),

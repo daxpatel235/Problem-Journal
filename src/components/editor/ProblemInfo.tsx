@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ComboField } from "@/components/editor/ComboField";
+import { ProblemFolders } from "@/components/editor/ProblemFolders";
 import { useProblemStore } from "@/stores/problemStore";
 import { DIFFICULTY_PRESETS, PATTERN_CATEGORY_PRESETS, PLATFORM_PRESETS, TOPIC_PRESETS } from "@/lib/presets";
 
@@ -104,6 +105,8 @@ export function ProblemInfo() {
           />
         </div>
       </div>
+
+      <ProblemFolders />
 
       <div className="flex flex-wrap justify-end gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground/70">
         <span>Created {formatTimestamp(problem.createdAt)}</span>

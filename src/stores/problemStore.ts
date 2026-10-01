@@ -19,11 +19,13 @@ interface ProblemState {
   isNew: boolean;
   isDirty: boolean;
   isSaving: boolean;
+  /** Folder a brand-new (not yet saved) problem should be filed into on its first save. */
+  pendingFolderId: string | null;
 
   fetchProblems: () => Promise<void>;
   setFilters: (filters: ProblemFilters) => Promise<void>;
   selectProblem: (id: string) => Promise<void>;
-  newProblem: () => Promise<void>;
+  newProblem: (options?: { folderId?: string }) => Promise<void>;
   updateDraft: (patch: Partial<ProblemFormData>) => void;
   saveDraft: () => Promise<SaveResult>;
   flushSave: () => Promise<void>;
@@ -48,6 +50,7 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
   isNew: false,
   isDirty: false,
   isSaving: false,
+  pendingFolderId: null,
 
   fetchProblems: async () => {
     set({ isLoading: true });
@@ -83,11 +86,12 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
         selectedProblem: problem,
         isNew: false,
         isDirty: false,
+        pendingFolderId: null,
       });
     }
   },
 
-  newProblem: async () => {
+  newProblem: async (options) => {
     await get().flushSave();
     const draft: Problem = {
       id: "",
@@ -96,7 +100,13 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
       updatedAt: "",
       ...EMPTY_PROBLEM_FORM,
     };
-    set({ selectedId: null, selectedProblem: draft, isNew: true, isDirty: false });
+    set({
+      selectedId: null,
+      selectedProblem: draft,
+      isNew: true,
+      isDirty: false,
+      pendingFolderId: options?.folderId ?? null,
+    });
   },
 
   updateDraft: (patch) => {
@@ -121,6 +131,16 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
         ? await api.problems.create(draft)
         : await api.problems.update({ id: snapshot.id, ...draft });
 
+      // A problem started inside a folder gets filed there once it exists.
+      const folderId = isNew ? get().pendingFolderId : null;
+      if (folderId) {
+        try {
+          await api.folders.addProblems(folderId, [saved.id]);
+        } catch (err) {
+          console.error("Failed to add new problem to its folder", err);
+        }
+      }
+
       const current = get().selectedProblem;
       const editedDuringSave = current !== null && current !== snapshot;
 
@@ -140,6 +160,7 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
         isNew: false,
         isDirty: editedDuringSave,
         isSaving: false,
+        pendingFolderId: null,
       });
       await get().fetchProblems();
       return "saved";
@@ -191,10 +212,22 @@ export const useProblemStore = create<ProblemState>((set, get) => ({
     await get().flushSave();
     const copy = await api.problems.duplicate(id);
     await get().fetchProblems();
-    set({ selectedId: copy.id, selectedProblem: copy, isNew: false, isDirty: false });
+    set({
+      selectedId: copy.id,
+      selectedProblem: copy,
+      isNew: false,
+      isDirty: false,
+      pendingFolderId: null,
+    });
   },
 
   clearSelection: () => {
-    set({ selectedId: null, selectedProblem: null, isNew: false, isDirty: false });
+    set({
+      selectedId: null,
+      selectedProblem: null,
+      isNew: false,
+      isDirty: false,
+      pendingFolderId: null,
+    });
   },
 }));

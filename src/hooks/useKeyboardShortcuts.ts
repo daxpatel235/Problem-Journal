@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useProblemStore } from "@/stores/problemStore";
+import { useFolderStore } from "@/stores/folderStore";
 import { useUiStore } from "@/stores/uiStore";
 import { useZoom } from "@/hooks/useZoom";
 
@@ -23,9 +24,28 @@ export function useKeyboardShortcuts() {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const mod = event.ctrlKey || event.metaKey;
+      const inFolders = useUiStore.getState().view === "folders";
+      const folderState = useFolderStore.getState();
+      // In the folder view the editor is only on screen while a problem is
+      // open full screen; editor shortcuts must not act on a hidden problem.
+      const editorVisible = !inFolders || folderState.focusOpen;
 
       if (!mod) {
-        if (event.key === "Delete" && selectedId && !isEditableTarget(event.target)) {
+        const isBack =
+          (event.altKey && event.key === "ArrowLeft") ||
+          (event.key === "Backspace" && !event.altKey && !isEditableTarget(event.target));
+        if (inFolders && isBack && !document.querySelector('[data-slot="dialog-content"]')) {
+          event.preventDefault();
+          if (folderState.focusOpen) void folderState.closeProblem();
+          else void folderState.goUp();
+          return;
+        }
+        if (
+          event.key === "Delete" &&
+          selectedId &&
+          editorVisible &&
+          !isEditableTarget(event.target)
+        ) {
           event.preventDefault();
           requestConfirm({
             title: "Move problem to trash?",
@@ -42,7 +62,9 @@ export function useKeyboardShortcuts() {
         case "n":
         case "N":
           event.preventDefault();
-          newProblem();
+          // Inside a folder, a new problem is filed into that folder.
+          if (inFolders && folderState.currentFolderId) void folderState.newProblemHere();
+          else void newProblem();
           break;
         case "s":
         case "S":
@@ -62,7 +84,7 @@ export function useKeyboardShortcuts() {
         case "d":
         case "D":
           event.preventDefault();
-          if (selectedId) void duplicateProblem(selectedId);
+          if (selectedId && editorVisible) void duplicateProblem(selectedId);
           break;
         case "+":
         case "=":

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   BarChart3Icon,
   CopyIcon,
+  FolderTreeIcon,
   GraduationCapIcon,
   MonitorIcon,
   MoonIcon,
@@ -26,6 +27,7 @@ import {
 import { useZoom } from "@/hooks/useZoom";
 import { useProblemStore } from "@/stores/problemStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useFolderStore } from "@/stores/folderStore";
 import { useUiStore } from "@/stores/uiStore";
 
 export function CommandPalette() {
@@ -37,6 +39,7 @@ export function CommandPalette() {
   const openTrash = useUiStore((s) => s.openTrash);
   const openSettings = useUiStore((s) => s.openSettings);
   const requestConfirm = useUiStore((s) => s.requestConfirm);
+  const setView = useUiStore((s) => s.setView);
 
   const problems = useProblemStore((s) => s.problems);
   const selectedId = useProblemStore((s) => s.selectedId);
@@ -123,6 +126,18 @@ export function CommandPalette() {
         <CommandSeparator />
 
         <CommandGroup heading="Go to">
+          <CommandItem
+            value="folders explorer organize directory"
+            onSelect={() =>
+              run(() => {
+                setView("folders");
+                void useFolderStore.getState().openFolder(null);
+              })
+            }
+          >
+            <FolderTreeIcon />
+            Folders
+          </CommandItem>
           <CommandItem value="review spaced repetition" onSelect={() => run(openReview)}>
             <GraduationCapIcon />
             Review
