@@ -24,7 +24,8 @@ jobs:
           - platform: ubuntu-22.04
             args: "--bundles deb,appimage"
           - platform: windows-latest
-            args: ""
+            # MSI installer only — no NSIS .exe setup.
+            args: "--bundles msi"
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -68,3 +69,16 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+  # Publish the release only once every platform's installer has been uploaded,
+  # so nobody downloads from a half-finished release.
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ github.ref_name }}" --draft=false --latest --repo "${{ github.repository }}"

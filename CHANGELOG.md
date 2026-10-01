@@ -8,6 +8,32 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 _Nothing yet._
 
+## [0.4.0] — 2026-10-01
+
+### Added
+
+- **Folders** — a file-explorer view (new Folders icon in the sidebar) for organizing
+  problems. Name folders anything you like, nest them in subfolders, rename, move, and
+  delete them.
+  - Open a folder to see its subfolders and problems (difficulty, topic, last updated),
+    with a breadcrumb path and a **←** back arrow (`Alt+←` / `Backspace`).
+  - **Add Problems** picks any of your existing problems (searchable, multi-select); a
+    problem can live in several folders at once. **New Problem** inside a folder files
+    the new problem there automatically.
+  - Per-problem actions: add to another folder, move to another folder, remove from this
+    folder, move to trash.
+  - Clicking a problem opens it full screen in the editor (autosave included); **←**
+    returns to the folder.
+  - Problems can only be added once at least one folder exists.
+  - Deleting a folder also deletes its subfolders, but never the problems inside them.
+  - The editor shows which folders a problem is in, with one-click add/remove.
+- Duplicating a problem puts the copy in the same folders as the original.
+
+### Changed
+
+- Windows releases now ship as an `.msi` installer only (the NSIS `.exe` setup is no
+  longer built).
+
 ## [0.3.0] — 2026-08-02
 
 ### Added
@@ -100,7 +126,8 @@ All four are full-text searchable and included in Markdown/PDF/JSON export.
 - Initial version: timeline, structured editor, Monaco code editor, full-text search,
   favorites/trash/duplication, export (Markdown/JSON/PDF), and backups.
 
-[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.1.0...v0.2.0

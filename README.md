@@ -14,7 +14,7 @@ A personal, offline, developer-grade desktop app for recording DSA problem-solvi
 
 Grab the installer for your OS from the [**latest release**](https://github.com/daxpatel235/Problem-Journal/releases/latest):
 
-- **Windows** — `.exe` (NSIS) or `.msi`
+- **Windows** — `.msi`
 - **macOS** — `.dmg`
 - **Linux** — `.AppImage` or `.deb`
 
@@ -28,7 +28,7 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 
 **Windows (SmartScreen):**
 
-1. Double-click `Problem.Journal_0.1.0_x64-setup.exe`.
+1. Double-click `Problem.Journal_0.4.0_x64_en-US.msi`.
 2. On the blue "Windows protected your PC" dialog, click **More info**.
 3. Click the **Run anyway** button that appears, then continue the installer.
 
@@ -40,11 +40,11 @@ Grab the installer for your OS from the [**latest release**](https://github.com/
 
 **Linux:**
 
-- **`.deb`** — install with `sudo dpkg -i Problem.Journal_0.1.0_amd64.deb` (no warning).
+- **`.deb`** — install with `sudo dpkg -i Problem.Journal_0.4.0_amd64.deb` (no warning).
 - **`.AppImage`** — mark it executable first, then run it:
   ```bash
-  chmod +x Problem.Journal_0.1.0_amd64.AppImage
-  ./Problem.Journal_0.1.0_amd64.AppImage
+  chmod +x Problem.Journal_0.4.0_amd64.AppImage
+  ./Problem.Journal_0.4.0_amd64.AppImage
   ```
 
 ### Why you can trust it
@@ -71,6 +71,7 @@ Most people solve hundreds of DSA problems while prepping for interviews and rem
 ## Features
 
 - **Timeline** — every problem you've logged, grouped by Today / Yesterday / This Week / This Month / older, with quick filters (favorites, difficulty, date range) and instant search.
+- **Folders** — a file-explorer view to organize problems into folders you name yourself (e.g. Arrays › Sliding Window). Nest folders, rename/move/delete them, add existing problems in bulk (a problem can be in several folders), and open any problem full screen with a back arrow to return.
 - **Structured editor** — problem name, difficulty, topic, platform, URL, pattern category, and four dynamic, reorderable lists: Pattern, Thinking, Mistakes, Takeaways.
 - **Code editor** — full Monaco editor (VS Code's own editor) with a language picker, syntax highlighting, and a dark theme that matches the rest of the app.
 - **Autosave** — every edit is saved automatically ~2.5s after you stop typing, with a live "Saving… / Saved" indicator. `Ctrl+S` saves immediately.
@@ -115,7 +116,7 @@ npm run tauri dev
 npm run tauri build
 ```
 
-On Windows this produces both an NSIS installer (`.exe`) and a WiX installer (`.msi`) under `src-tauri/target/release/bundle/`.
+On Windows, run `npm run tauri build -- --bundles msi` to produce the `.msi` installer under `src-tauri/target/release/bundle/msi/` (this is what the release workflow publishes).
 
 ## Where your data lives
 
@@ -152,6 +153,7 @@ This does **not** affect fresh installs — new users never hit it.
 | `Ctrl+K` | Command palette |
 | `Ctrl+F` | Search |
 | `Ctrl+D` | Duplicate problem |
+| `Alt+←` / `Backspace` | Back (in Folders) |
 | `Delete` | Move to trash |
 | `Ctrl +` / `Ctrl -` / `Ctrl 0` | Zoom in / out / reset |
 
