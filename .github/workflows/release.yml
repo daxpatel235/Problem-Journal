@@ -78,7 +78,19 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+
+      # Uses release-notes/<tag>.md as the release description when it exists;
+      # otherwise the default text set by the build job is kept.
       - name: Publish release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release edit "${{ github.ref_name }}" --draft=false --latest --repo "${{ github.repository }}"
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          NOTES="release-notes/${TAG}.md"
+          if [ -f "$NOTES" ]; then
+            gh release edit "$TAG" --notes-file "$NOTES" --draft=false --latest --repo "$REPO"
+          else
+            gh release edit "$TAG" --draft=false --latest --repo "$REPO"
+          fi
