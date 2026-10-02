@@ -1,38 +1,187 @@
 name: Release
 
-# Publish installers when a version tag is pushed, e.g.:
-#   git tag v0.1.0 && git push origin v0.1.0
+# Builds installers for every supported platform.
+#
+#   Push a version tag  ->  build all platforms, publish a GitHub release
+#       git tag v0.4.1 && git push origin v0.4.1
+#
+#   Run by hand (Actions tab -> Release -> Run workflow)  ->  test build only;
+#   the installers are attached to the run as downloadable artifacts and
+#   nothing is published.
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+
+# Never run two releases for the same tag at once, and never cancel one
+# half-way (that would leave a half-uploaded draft behind).
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # Tauri's beforeBuildCommand runs `npm run build` (tsc + vite); the
+  # Monaco-heavy bundle runs out of Node's default heap on some runners.
+  NODE_OPTIONS: --max-old-space-size=4096
+  NODE_VERSION: 22
 
 jobs:
-  release:
-    permissions:
-      contents: write
-    env:
-      # Tauri's beforeBuildCommand runs `npm run build` (tsc + vite); the
-      # Monaco-heavy bundle OOMs Node's default heap on the macOS runner.
-      NODE_OPTIONS: --max-old-space-size=4096
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: macos-latest
-            args: "--target aarch64-apple-darwin"
-          - platform: macos-latest
-            args: "--target x86_64-apple-darwin"
-          - platform: ubuntu-22.04
-            args: "--bundles deb,appimage"
-          - platform: windows-latest
-            args: ""
-    runs-on: ${{ matrix.platform }}
+  # ---------------------------------------------------------------------------
+  # 1. Make sure the version numbers agree before spending build minutes.
+  # ---------------------------------------------------------------------------
+  prepare:
+    name: Check version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Tauri system dependencies (Linux)
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: Verify version numbers match
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          PKG=$(node -p "require('./package.json').version")
+          TAURI=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          CARGO=$(sed -n 's/^version *= *"\(.*\)"/\1/p' src-tauri/Cargo.toml | head -n1)
+
+          echo "package.json      $PKG"
+          echo "tauri.conf.json   $TAURI"
+          echo "Cargo.toml        $CARGO"
+
+          if [ "$PKG" != "$TAURI" ] || [ "$PKG" != "$CARGO" ]; then
+            echo "::error::Version mismatch: package.json=$PKG, tauri.conf.json=$TAURI, Cargo.toml=$CARGO. Make all three the same."
+            exit 1
+          fi
+
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [ "$TAG_VERSION" != "$PKG" ]; then
+              echo "::error::Tag ${GITHUB_REF_NAME} does not match app version $PKG. Tag the commit as v$PKG instead."
+              exit 1
+            fi
+          fi
+
+          # A tag such as v0.5.0-beta.1 is published as a pre-release.
+          if [[ "$PKG" == *-* ]]; then PRE=true; else PRE=false; fi
+
+          echo "version=$PKG" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRE" >> "$GITHUB_OUTPUT"
+          echo "### Building Problem Journal v$PKG" >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # 2. Create ONE draft release up front (tag pushes only). Every build job
+  #    uploads into it by id, so parallel jobs can't race to create duplicates.
+  # ---------------------------------------------------------------------------
+  create-release:
+    name: Create draft release
+    needs: prepare
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create (or reuse) draft release
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
+        run: |
+          set -euo pipefail
+          NOTES="release-notes/${TAG}.md"
+          if [ ! -f "$NOTES" ]; then
+            NOTES="$RUNNER_TEMP/notes.md"
+            printf '%s\n\n%s\n' \
+              "Download the installer for your platform below." \
+              "> Windows and macOS builds are **unsigned**, so your OS may warn you about an unknown publisher. See the README for how to proceed." \
+              > "$NOTES"
+          fi
+
+          # Re-running a failed release reuses its existing draft.
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            EXTRA=()
+            if [ "$PRERELEASE" = "true" ]; then EXTRA+=(--prerelease); fi
+            gh release create "$TAG" \
+              --draft \
+              --verify-tag \
+              --title "Problem Journal $TAG" \
+              --notes-file "$NOTES" \
+              "${EXTRA[@]}"
+          fi
+
+          ID=$(gh release view "$TAG" --json databaseId --jq .databaseId)
+          echo "id=$ID" >> "$GITHUB_OUTPUT"
+
+  # ---------------------------------------------------------------------------
+  # 3. Build every platform in parallel.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (${{ matrix.name }})
+    needs: [prepare, create-release]
+    # Runs after create-release on tag pushes, and right after prepare on
+    # manual runs (where create-release is skipped).
+    if: >-
+      ${{ !cancelled() && needs.prepare.result == 'success' &&
+      (needs.create-release.result == 'success' || needs.create-release.result == 'skipped') }}
+    permissions:
+      contents: write
+    strategy:
+      # One platform failing must not cancel the others.
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Apple Silicon
+            os: macos-latest
+            target: aarch64-apple-darwin
+            args: --target aarch64-apple-darwin
+
+          - name: macOS Intel
+            os: macos-latest
+            target: x86_64-apple-darwin
+            args: --target x86_64-apple-darwin
+
+          - name: Windows x64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            args: ""
+
+          # Cross-compiled on the x64 runner, as recommended by Tauri. WiX
+          # (.msi) cannot target ARM64, so this ships the NSIS installer. The
+          # installer itself runs under emulation; the app is native ARM64.
+          - name: Windows ARM64
+            os: windows-latest
+            target: aarch64-pc-windows-msvc
+            args: --target aarch64-pc-windows-msvc --bundles nsis
+
+          - name: Linux x64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            args: --bundles deb,rpm,appimage
+
+          # GitHub's native ARM64 runner (free for public repositories).
+          - name: Linux ARM64
+            os: ubuntu-22.04-arm
+            target: aarch64-unknown-linux-gnu
+            args: --bundles deb,rpm,appimage
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -40,60 +189,94 @@ jobs:
             libappindicator3-dev \
             librsvg2-dev \
             patchelf \
-            libxdo-dev
+            libxdo-dev \
+            xdg-utils
+
+      # `ring` (used by rustls) needs clang to build for Windows on ARM.
+      # LLVM is preinstalled on the Windows runner; make sure it's on PATH.
+      - name: Put clang on PATH (Windows ARM64)
+        if: matrix.target == 'aarch64-pc-windows-msvc'
+        shell: pwsh
+        run: |
+          "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.target }}
 
       - uses: swatinem/rust-cache@v2
         with:
           workspaces: ./src-tauri -> target
+          key: ${{ matrix.target }}
 
-      - run: npm ci
+      - name: Install frontend dependencies
+        run: npm ci
 
-      - name: Build & publish (draft release)
-        uses: tauri-apps/tauri-action@v0
+      - name: Build installers
+        id: tauri
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: ${{ github.ref_name }}
-          releaseName: "Problem Journal ${{ github.ref_name }}"
-          releaseBody: |
-            Download the installer for your platform below.
-
-            > Windows and macOS builds are **unsigned**, so your OS may warn you
-            > about an unknown publisher. See the README for how to proceed.
-          releaseDraft: true
-          prerelease: false
+          # Set on tag pushes -> upload into the draft release.
+          # Empty on manual runs -> build only.
+          releaseId: ${{ needs.create-release.outputs.release_id }}
           args: ${{ matrix.args }}
+          retryAttempts: 1
+          # Manual runs: attach the installers to the run instead.
+          uploadWorkflowArtifacts: ${{ github.ref_type != 'tag' }}
+          workflowArtifactNamePattern: "[name]_[version]_[platform]_[arch]_[bundle]"
 
-  # Publish the release only once every platform's installer has been uploaded,
-  # so nobody downloads from a half-finished release.
+      - name: Summary
+        if: success()
+        shell: bash
+        env:
+          PATHS: ${{ steps.tauri.outputs.artifactPaths }}
+        run: |
+          {
+            echo "#### ${{ matrix.name }}"
+            echo "${PATHS:-[]}" | jq -r '.[] | split("/") | last | split("\\") | last | "- \(.)"'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # 4. Publish only after every platform uploaded, so nobody downloads from a
+  #    half-finished release. Also attach SHA-256 checksums for every file.
+  # ---------------------------------------------------------------------------
   publish:
-    needs: release
+    name: Publish release
+    needs: [prepare, create-release, build]
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-
-      # Uses release-notes/<tag>.md as the release description when it exists;
-      # otherwise the default text set by the build job is kept.
-      - name: Publish release
+      - name: Add checksums and publish
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.ref_name }}
           REPO: ${{ github.repository }}
+          PRERELEASE: ${{ needs.prepare.outputs.prerelease }}
         run: |
-          NOTES="release-notes/${TAG}.md"
-          if [ -f "$NOTES" ]; then
-            gh release edit "$TAG" --notes-file "$NOTES" --draft=false --latest --repo "$REPO"
+          set -euo pipefail
+          mkdir -p assets
+          gh release download "$TAG" --repo "$REPO" --dir assets --skip-existing
+          (
+            cd assets
+            rm -f SHA256SUMS.txt
+            sha256sum -- * > ../SHA256SUMS.txt
+          )
+          cat SHA256SUMS.txt
+          gh release upload "$TAG" SHA256SUMS.txt --repo "$REPO" --clobber
+
+          if [ "$PRERELEASE" = "true" ]; then
+            gh release edit "$TAG" --repo "$REPO" --draft=false --prerelease
           else
-            gh release edit "$TAG" --draft=false --latest --repo "$REPO"
+            gh release edit "$TAG" --repo "$REPO" --draft=false --latest
           fi
+          echo "Published https://github.com/$REPO/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"

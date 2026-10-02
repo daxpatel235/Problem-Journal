@@ -8,6 +8,33 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 _Nothing yet._
 
+## [0.4.1] — 2026-10-02
+
+### Added
+
+- **Full-screen code editor.** A new full-screen button sits to the left of the
+  language dropdown in the **Code** section. It expands the editor to fill the whole
+  window, so long solutions are as comfortable to write as in VS Code.
+  - A **← Back to problem** arrow in the top-left corner returns to the problem page.
+    `Esc` or the minimize button next to the dropdown do the same.
+  - `Esc` still closes the editor's own pop-ups first (find, autocomplete), so it only
+    leaves full screen when nothing else is open.
+  - Your code, cursor position, scroll position and undo history are kept when you
+    switch in and out, and the cursor goes straight back into the editor so you can
+    keep typing.
+  - The language can still be changed while in full screen.
+- **More platforms.** Releases now include native builds for **Windows on ARM**
+  (ARM64) and **Linux on ARM** (ARM64), plus an `.rpm` package for Fedora / RHEL /
+  openSUSE, alongside the existing Windows x64, macOS (Apple Silicon and Intel) and
+  Linux x64 builds.
+
+### Changed
+
+- The release workflow now checks that the git tag matches the version in
+  `package.json`, `tauri.conf.json` and `Cargo.toml` before building anything, and can
+  be run by hand from the **Actions** tab to produce test builds without publishing a
+  release.
+
 ## [0.4.0] — 2026-10-01
 
 ### Added
@@ -121,7 +148,8 @@ All four are full-text searchable and included in Markdown/PDF/JSON export.
 - Initial version: timeline, structured editor, Monaco code editor, full-text search,
   favorites/trash/duplication, export (Markdown/JSON/PDF), and backups.
 
-[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.0...v0.2.1
