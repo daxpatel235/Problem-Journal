@@ -6,6 +6,10 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [0.5.0] — 2026-11-16
+
 ### Added
 
 - **Export to PDF.** A new **Export** button (share icon) sits at the bottom of the
@@ -34,6 +38,10 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - The PDF engine is built into the app: it works offline and uses half of your
     CPU cores so the app stays responsive. Only the letters a PDF actually uses are
     embedded, so files stay small.
+
+### Changed
+
+- CI now runs the Rust tests on Linux and Windows on every pull request.
 
 ### Removed
 
@@ -179,7 +187,8 @@ All four are full-text searchable and included in Markdown/PDF/JSON export.
 - Initial version: timeline, structured editor, Monaco code editor, full-text search,
   favorites/trash/duplication, export (Markdown/JSON/PDF), and backups.
 
-[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/daxpatel235/Problem-Journal/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/daxpatel235/Problem-Journal/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/daxpatel235/Problem-Journal/compare/v0.2.1...v0.3.0
