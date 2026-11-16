@@ -77,6 +77,9 @@ pub fn worker_threads() -> usize {
         .unwrap_or(1)
 }
 
+/// One problem's pages and glyph usage, or why it couldn't be laid out.
+type LayoutResult = Result<(Vec<Page>, Usage), String>;
+
 fn display_name(p: &Problem) -> String {
     let name = p.problem_name.trim();
     if name.is_empty() { "Untitled problem".to_string() } else { name.to_string() }
@@ -110,7 +113,7 @@ pub fn render(
     // 1. Lay out every problem in parallel. Order is kept by index.
     let done = AtomicUsize::new(0);
     progress(Progress { phase: Phase::Layout, done: 0, total });
-    let laid_out: Vec<Option<Result<(Vec<Page>, Usage), String>>> = pool.install(|| {
+    let laid_out: Vec<Option<LayoutResult>> = pool.install(|| {
         input
             .problems
             .par_iter()

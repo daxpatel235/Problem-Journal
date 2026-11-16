@@ -62,10 +62,7 @@ fn components(glyph: &[u8]) -> Vec<u16> {
         return out;
     }
     let mut at = 10; // skip the glyph header
-    loop {
-        let (Some(flags), Some(gid)) = (read_u16(glyph, at), read_u16(glyph, at + 2)) else {
-            break;
-        };
+    while let (Some(flags), Some(gid)) = (read_u16(glyph, at), read_u16(glyph, at + 2)) {
         out.push(gid);
         at += 4;
         at += if flags & ARG_1_AND_2_ARE_WORDS != 0 { 4 } else { 2 };
@@ -168,7 +165,7 @@ pub fn subset(data: &[u8], index: u32, used: &BTreeSet<u16>) -> Result<Vec<u8>, 
     if let Some(post) = new_post {
         tables.push((*b"post", post));
     }
-    tables.sort_by(|a, b| a.0.cmp(&b.0));
+    tables.sort_by_key(|t| t.0);
 
     Ok(write_font(tables))
 }

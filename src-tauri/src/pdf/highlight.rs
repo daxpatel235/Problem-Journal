@@ -230,8 +230,8 @@ pub fn highlight(code: &str, language: &str) -> Vec<Vec<Span>> {
                 break;
             }
             if let Some((start, end)) = lang.block_comment {
-                if rest.starts_with(start) {
-                    match rest[start.len()..].find(end) {
+                if let Some(after) = rest.strip_prefix(start) {
+                    match after.find(end) {
                         Some(pos) => {
                             let stop = i + start.len() + pos + end.len();
                             push(&mut spans, i, stop, Token::Comment);
