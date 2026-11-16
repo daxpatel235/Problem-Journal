@@ -13,6 +13,7 @@ import { TrashDialog } from "@/components/shared/TrashDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { FolderExplorer } from "@/components/folders/FolderExplorer";
 import { FocusedProblemView } from "@/components/folders/FocusedProblemView";
+import { ExportView } from "@/components/export/ExportView";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useFolderStore } from "@/stores/folderStore";
 import { useProblemStore } from "@/stores/problemStore";
@@ -51,10 +52,36 @@ function useFolderFocusSync() {
   }, [view, selectedProblem, selectedId, isNew, focusOpen, setFocusOpen]);
 }
 
+/**
+ * The export page has no editor. If a problem gets opened from elsewhere while
+ * it's showing (search, command palette, Ctrl+N), go to the timeline so the
+ * problem is actually visible.
+ */
+function useExportLeaveOnOpen() {
+  const view = useUiStore((s) => s.view);
+  const setView = useUiStore((s) => s.setView);
+  const selectedId = useProblemStore((s) => s.selectedId);
+  const isNew = useProblemStore((s) => s.isNew);
+  const previous = useRef({ selectedId, isNew });
+
+  useEffect(() => {
+    const prev = previous.current;
+    previous.current = { selectedId, isNew };
+    if (view !== "export") return;
+    // A brand-new problem getting its id on first save is not "opening" one.
+    const firstSave = prev.isNew && !isNew && prev.selectedId === null;
+    const opened =
+      (selectedId !== prev.selectedId && selectedId !== null && !firstSave) ||
+      (isNew && !prev.isNew);
+    if (opened) setView("timeline");
+  }, [view, selectedId, isNew, setView]);
+}
+
 export function AppLayout() {
   const view = useUiStore((s) => s.view);
   const focusOpen = useFolderStore((s) => s.focusOpen);
   useFolderFocusSync();
+  useExportLeaveOnOpen();
   const storedWidth = useSettingsStore((s) => s.timelineWidth);
   const persistTimelineWidth = useSettingsStore((s) => s.setTimelineWidth);
 
@@ -86,7 +113,9 @@ export function AppLayout() {
       <TopBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        {view === "folders" ? (
+        {view === "export" ? (
+          <ExportView />
+        ) : view === "folders" ? (
           <div className="flex flex-1 overflow-hidden">
             {focusOpen ? <FocusedProblemView /> : <FolderExplorer />}
           </div>

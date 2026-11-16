@@ -8,8 +8,11 @@ interface ConfirmOptions {
   onConfirm: () => void;
 }
 
-/** Which main screen is showing: the timeline + editor split, or the folder explorer. */
-export type MainView = "timeline" | "folders";
+/**
+ * Which main screen is showing: the timeline + editor split, the folder
+ * explorer, or the export page.
+ */
+export type MainView = "timeline" | "folders" | "export";
 
 interface UiState {
   view: MainView;

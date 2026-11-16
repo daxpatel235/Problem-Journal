@@ -1,6 +1,6 @@
 use tauri::State;
 
-use crate::models::folder::Folder;
+use crate::models::folder::{Folder, FolderLink};
 use crate::models::problem::ProblemSummary;
 use crate::repositories::folder_repo;
 use crate::AppState;
@@ -101,6 +101,14 @@ pub async fn move_problem_to_folder(
 ) -> Result<(), String> {
     let pool = state.pool.read().await.clone();
     folder_repo::move_problem(&pool, &problem_id, &from_folder_id, &to_folder_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn list_folder_links(state: State<'_, AppState>) -> Result<Vec<FolderLink>, String> {
+    let pool = state.pool.read().await.clone();
+    folder_repo::list_links(&pool)
         .await
         .map_err(|e| e.to_string())
 }

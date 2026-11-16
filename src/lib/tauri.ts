@@ -7,7 +7,7 @@ import type {
   UpdateProblemInput,
 } from "@/types/problem";
 import type { BackupInfo, SettingsMap } from "@/types/settings";
-import type { Folder } from "@/types/folder";
+import type { Folder, FolderLink } from "@/types/folder";
 
 export const api = {
   problems: {
@@ -47,6 +47,7 @@ export const api = {
       invoke<void>("move_problem_to_folder", { problemId, fromFolderId, toFolderId }),
     folderIdsForProblem: (problemId: string) =>
       invoke<string[]>("get_problem_folder_ids", { problemId }),
+    listLinks: () => invoke<FolderLink[]>("list_folder_links"),
   },
   settings: {
     get: (key: string) => invoke<string | null>("get_setting", { key }),
@@ -63,8 +64,45 @@ export const api = {
     problemMarkdown: (id: string) =>
       invoke<string>("export_problem_markdown", { id }),
     problemJson: (id: string) => invoke<string>("export_problem_json", { id }),
-    problemPdfHtml: (id: string) =>
-      invoke<string>("export_problem_pdf_html", { id }),
     allJson: () => invoke<string>("export_all_json"),
+    pdf: (request: PdfExportRequest) => invoke<PdfExportReport>("export_pdf", { request }),
+    cancelPdf: () => invoke<void>("cancel_pdf_export"),
+    openPdf: (path: string) => invoke<void>("open_exported_pdf", { path }),
+    revealPdf: (path: string) => invoke<void>("reveal_exported_pdf", { path }),
   },
 };
+
+export interface PdfExportRequest {
+  /** Problems in the order they appear in the PDF. */
+  problemIds: string[];
+  path: string;
+  /** Title page heading (folder name, "All Problems"…). */
+  title: string;
+  /** Under the title, e.g. "8 problems · Folder export". */
+  subtitle: string;
+  /** Footer date, already in the user's locale. */
+  exportedOn: string;
+}
+
+export interface PdfExportFailure {
+  id: string;
+  name: string;
+  reason: string;
+}
+
+export interface PdfExportReport {
+  path: string;
+  pages: number;
+  exported: number;
+  bytes: number;
+  failed: PdfExportFailure[];
+}
+
+/** Payload of the "pdf-export-progress" event. */
+export interface PdfExportProgress {
+  phase: "layout" | "writing";
+  done: number;
+  total: number;
+}
+
+export const PDF_PROGRESS_EVENT = "pdf-export-progress";

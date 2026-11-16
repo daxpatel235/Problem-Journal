@@ -2,6 +2,7 @@ pub mod commands;
 pub mod config;
 pub mod database;
 pub mod models;
+pub mod pdf;
 pub mod repositories;
 pub mod services;
 pub mod utils;
@@ -114,6 +115,7 @@ pub fn run() {
             commands::folder_commands::remove_problem_from_folder,
             commands::folder_commands::move_problem_to_folder,
             commands::folder_commands::get_problem_folder_ids,
+            commands::folder_commands::list_folder_links,
             commands::settings_commands::get_setting,
             commands::settings_commands::set_setting,
             commands::settings_commands::get_all_settings,
@@ -122,8 +124,11 @@ pub fn run() {
             commands::backup_commands::restore_backup,
             commands::export_commands::export_problem_markdown,
             commands::export_commands::export_problem_json,
-            commands::export_commands::export_problem_pdf_html,
             commands::export_commands::export_all_json,
+            commands::export_commands::export_pdf,
+            commands::export_commands::cancel_pdf_export,
+            commands::export_commands::open_exported_pdf,
+            commands::export_commands::reveal_exported_pdf,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

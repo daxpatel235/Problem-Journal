@@ -53,3 +53,40 @@ jobs:
       - name: cargo clippy
         working-directory: src-tauri
         run: cargo clippy --all-targets -- -D warnings
+      - name: cargo test
+        working-directory: src-tauri
+        run: cargo test --all-targets
+      # When dependencies change, the build updates Cargo.lock; keep the
+      # result so it can be committed (and flag it in the run summary).
+      - name: Check Cargo.lock is committed
+        id: lockfile
+        if: always()
+        shell: bash
+        run: |
+          if git diff --quiet -- src-tauri/Cargo.lock; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::Cargo.lock is out of date. Download the 'Cargo.lock' artifact from this run and commit it."
+          fi
+      - name: Upload updated Cargo.lock
+        if: always() && steps.lockfile.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cargo.lock
+          path: src-tauri/Cargo.lock
+
+  rust-windows:
+    name: Rust tests (Windows)
+    # Windows has the system fonts the PDF export falls back to (Nirmala UI
+    # for Hindi, Segoe UI Symbol), so the export tests run here too.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri -> target
+      - name: cargo test
+        working-directory: src-tauri
+        run: cargo test --all-targets

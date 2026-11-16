@@ -24,9 +24,3 @@ export async function openTextFromFile(extensions: string[]): Promise<string | n
   if (typeof path !== "string") return null;
   return readTextFile(path);
 }
-
-export function openHtmlForPrint(html: string) {
-  const blob = new Blob([html], { type: "text/html" });
-  const url = URL.createObjectURL(blob);
-  window.open(url, "_blank");
-}

@@ -110,6 +110,24 @@ pub async fn get_by_id(pool: &DbPool, id: &str) -> Result<Option<Problem>, sqlx:
     Ok(row.map(Problem::from))
 }
 
+/// Full problems for `ids` (trashed ones excluded), in no particular order.
+/// Reads in chunks to stay under SQLite's bound-variable limit.
+pub async fn get_many(pool: &DbPool, ids: &[String]) -> Result<Vec<Problem>, sqlx::Error> {
+    let mut out = Vec::with_capacity(ids.len());
+    for chunk in ids.chunks(500) {
+        let mut builder: QueryBuilder<Sqlite> =
+            QueryBuilder::new("SELECT * FROM problems WHERE is_deleted = 0 AND id IN (");
+        let mut separated = builder.separated(", ");
+        for id in chunk {
+            separated.push_bind(id.clone());
+        }
+        separated.push_unseparated(")");
+        let rows = builder.build_query_as::<ProblemRow>().fetch_all(pool).await?;
+        out.extend(rows.into_iter().map(Problem::from));
+    }
+    Ok(out)
+}
+
 pub async fn list_all(pool: &DbPool) -> Result<Vec<ProblemSummary>, sqlx::Error> {
     let rows = sqlx::query_as::<_, ProblemSummaryRow>(&format!(
         "SELECT {SUMMARY_COLUMNS} FROM problems WHERE is_deleted = 0 ORDER BY created_at DESC"

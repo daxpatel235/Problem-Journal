@@ -7,8 +7,8 @@ import {
   FileTextIcon,
   Loader2Icon,
   PlusIcon,
-  PrinterIcon,
   SaveIcon,
+  ShareIcon,
   Trash2Icon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,8 @@ import { CodeEditor } from "@/components/editor/CodeEditor";
 import { TagInput } from "@/components/editor/TagInput";
 import { COMPANY_PRESETS } from "@/lib/presets";
 import { api } from "@/lib/tauri";
-import { openHtmlForPrint, saveTextToFile } from "@/lib/exportFile";
+import { saveTextToFile } from "@/lib/exportFile";
+import { useExportStore } from "@/stores/exportStore";
 import { useProblemStore } from "@/stores/problemStore";
 import { useUiStore } from "@/stores/uiStore";
 
@@ -48,6 +49,7 @@ export function EditorPanel() {
   const saveDraft = useProblemStore((s) => s.saveDraft);
   const newProblem = useProblemStore((s) => s.newProblem);
   const duplicateProblem = useProblemStore((s) => s.duplicateProblem);
+  const openExport = useExportStore((s) => s.openExport);
   const requestConfirm = useUiStore((s) => s.requestConfirm);
   const deleteProblem = useProblemStore((s) => s.deleteProblem);
 
@@ -116,8 +118,7 @@ export function EditorPanel() {
         const json = await api.export.problemJson(problem.id);
         await saveTextToFile(json, `${problem.problemName || "problem"}.json`, ["json"]);
       } else {
-        const html = await api.export.problemPdfHtml(problem.id);
-        openHtmlForPrint(html);
+        await openExport({ mode: "one", problemIds: [problem.id] });
       }
     } catch (err) {
       toast.error(`Export failed: ${String(err)}`);
@@ -194,8 +195,8 @@ export function EditorPanel() {
                     Export as JSON
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => void handleExport("pdf")}>
-                    <PrinterIcon className="size-3.5" />
-                    Print / Save as PDF
+                    <ShareIcon className="size-3.5" />
+                    Export as PDF…
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -1,7 +1,7 @@
 use std::fmt;
 
 use crate::database::DbPool;
-use crate::models::folder::Folder;
+use crate::models::folder::{Folder, FolderLink};
 use crate::models::problem::{ProblemSummary, ProblemSummaryRow};
 use crate::utils;
 
@@ -284,6 +284,18 @@ pub async fn folder_ids_for_problem(pool: &DbPool, problem_id: &str) -> Result<V
             .fetch_all(pool)
             .await?;
     Ok(rows.into_iter().map(|(id,)| id).collect())
+}
+
+/// Every folder↔problem link for non-trashed problems, in one query. Used by
+/// the export picker to build its whole tree without one call per folder.
+pub async fn list_links(pool: &DbPool) -> Result<Vec<FolderLink>> {
+    let rows = sqlx::query_as::<_, FolderLink>(
+        "SELECT fp.folder_id, fp.problem_id FROM folder_problems fp \
+         JOIN problems p ON p.id = fp.problem_id WHERE p.is_deleted = 0",
+    )
+    .fetch_all(pool)
+    .await?;
+    Ok(rows)
 }
 
 /// Puts `to_problem_id` in every folder `from_problem_id` is in (used when

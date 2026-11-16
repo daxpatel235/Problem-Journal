@@ -8,3 +8,9 @@ export interface Folder {
   createdAt: string;
   updatedAt: string;
 }
+
+/** One "problem is in folder" link (trashed problems excluded). */
+export interface FolderLink {
+  folderId: string;
+  problemId: string;
+}

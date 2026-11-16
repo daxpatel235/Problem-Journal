@@ -6,7 +6,38 @@ follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-_Nothing yet._
+### Added
+
+- **Export to PDF.** A new **Export** button (share icon) sits at the bottom of the
+  sidebar above **Settings**, which is now pinned to the bottom like in VS Code.
+  Export also opens with `Ctrl+Shift+E`, from the command palette, from a folder's
+  **⋯** menu (or by right-clicking the folder), and from the editor's export menu.
+  - Choose what to export: one problem, any problems you tick, a folder (with its
+    subfolders), whatever your problem list's filters show, or everything.
+  - Pick problems in a folder tree with checkboxes, search and filters
+    (difficulty, topic, tag, favorites).
+  - The file name is suggested for you (`Two-Sum.pdf`, `Arrays.pdf`,
+    `Problem-Journal-All.pdf`), and the Windows **Save As** window lets you choose
+    where it goes.
+  - The PDF is A4 and light. It has only the fields you filled in, in the same order
+    as the editor, with code last and colored like the editor. Long code lines wrap
+    with a ↪ marker. Each problem starts on a new page, and every page has a header
+    and a page number.
+  - Exports with several problems get a title page and a contents page whose entries
+    link to each problem, plus a bookmark for every problem.
+  - Hindi and other Indian scripts print correctly using Windows' Nirmala UI font.
+    Emoji are left out.
+  - A progress bar shows how far along the export is, and it can be cancelled.
+    When it's done, **Open PDF** and **Show in folder** are one click away. If
+    a problem can't be exported, the rest still are and the PDF lists which ones
+    were left out.
+  - The PDF engine is built into the app: it works offline and uses half of your
+    CPU cores so the app stays responsive. Only the letters a PDF actually uses are
+    embedded, so files stay small.
+
+### Removed
+
+- The old **Print / Save as PDF** option, which relied on the print window.
 
 ## [0.4.1] — 2026-10-02
 

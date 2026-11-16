@@ -97,7 +97,9 @@ Most people solve hundreds of DSA problems while prepping for interviews and rem
 - **Autosave** — every edit is saved automatically ~2.5s after you stop typing, with a live "Saving… / Saved" indicator. `Ctrl+S` saves immediately.
 - **Full-text search** — SQLite FTS5-backed search across problem name, topic, pattern category, and every entry you've written.
 - **Favorites, trash, and duplication** — soft-delete with restore, one-click duplicate for near-identical problems, star your favorites.
-- **Export** — per-problem Markdown, JSON, or print-to-PDF; bulk JSON export of your whole journal.
+- **Export to PDF**: one problem, a folder, a filtered list or your whole journal as
+  an A4 PDF with a title page, clickable contents, page numbers and syntax-colored code.
+  Also per-problem Markdown and JSON, and bulk JSON export of your whole journal.
 - **Backups** — manual or automatic backups on app close, with configurable retention and one-click restore.
 - **Keyboard-first** — `Ctrl+N` new problem, `Ctrl+F` search, `Ctrl+D` duplicate, `Delete` to trash, `Ctrl +/-/0` to zoom.
 - **Offline-first** — everything lives in a local SQLite database (`~/.problem-journal/`). Nothing leaves your machine.
@@ -204,6 +206,7 @@ This does **not** affect fresh installs — new users never hit it.
 | `Ctrl+K` | Command palette |
 | `Ctrl+F` | Search |
 | `Ctrl+D` | Duplicate problem |
+| `Ctrl+Shift+E` | Export to PDF |
 | `Alt+←` / `Backspace` | Back (in Folders) |
 | `Delete` | Move to trash |
 | `Ctrl +` / `Ctrl -` / `Ctrl 0` | Zoom in / out / reset |
@@ -219,3 +222,7 @@ security issue? See [SECURITY.md](./SECURITY.md). Notable changes are tracked in
 ## License
 
 MIT — see [LICENSE](./LICENSE).
+
+The PDF export bundles the [Inter](https://rsms.me/inter/) and
+[JetBrains Mono](https://www.jetbrains.com/lp/mono/) fonts, both under the SIL Open
+Font License 1.1. Their license texts are in [`src-tauri/fonts/`](./src-tauri/fonts/).

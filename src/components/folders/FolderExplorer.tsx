@@ -16,6 +16,7 @@ import {
   PencilIcon,
   SearchIcon,
   SearchXIcon,
+  ShareIcon,
   StarIcon,
   Trash2Icon,
   XIcon,
@@ -34,6 +35,7 @@ import { FolderPickerDialog } from "@/components/folders/FolderPickerDialog";
 import { childFolders, folderContentsLabel, folderPath, folderSubtreeIds } from "@/lib/folders";
 import { api } from "@/lib/tauri";
 import { cn } from "@/lib/utils";
+import { useExportStore } from "@/stores/exportStore";
 import { useFolderStore } from "@/stores/folderStore";
 import { useProblemStore } from "@/stores/problemStore";
 import { useUiStore } from "@/stores/uiStore";
@@ -160,6 +162,9 @@ export function FolderExplorer() {
 
   const [creating, setCreating] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
+  /** Right-click on a folder row asks that row's ⋯ menu to open. */
+  const [menuRequest, setMenuRequest] = useState<{ id: string; n: number } | null>(null);
+  const openExport = useExportStore((s) => s.openExport);
   const [filter, setFilter] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const [picker, setPicker] = useState<PickerState | null>(null);
@@ -512,6 +517,12 @@ export function FolderExplorer() {
                   tabIndex={0}
                   aria-label={`Open folder ${folder.name}`}
                   onClick={() => renamingId !== folder.id && void openFolder(folder.id)}
+                  onContextMenu={(e) => {
+                    if (renamingId === folder.id) return;
+                    // Right-click opens the row's ⋯ menu (Open, Rename, Export…).
+                    e.preventDefault();
+                    setMenuRequest((r) => ({ id: folder.id, n: (r?.n ?? 0) + 1 }));
+                  }}
                   onKeyDown={(e) => {
                     if (e.target !== e.currentTarget) return;
                     if (e.key === "Enter") void openFolder(folder.id);
@@ -544,7 +555,10 @@ export function FolderExplorer() {
                   <span className="text-xs text-muted-foreground">
                     {formatDate(folder.updatedAt)}
                   </span>
-                  <RowMenu label={`Actions for ${folder.name}`}>
+                  <RowMenu
+                    label={`Actions for ${folder.name}`}
+                    openRequest={menuRequest?.id === folder.id ? menuRequest.n : 0}
+                  >
                     <DropdownMenuItem onClick={() => void openFolder(folder.id)}>
                       <FolderOpenIcon /> Open
                     </DropdownMenuItem>
@@ -553,6 +567,11 @@ export function FolderExplorer() {
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setPicker({ kind: "move-folder", folder })}>
                       <FolderInputIcon /> Move to…
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => void openExport({ mode: "folder", folderId: folder.id })}
+                    >
+                      <ShareIcon /> Export as PDF…
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -711,9 +730,25 @@ export function FolderExplorer() {
  * The "⋯" menu on each row. Rows can number in the thousands, so the real menu
  * is only created the first time it's clicked; until then it's a plain button.
  */
-function RowMenu({ label, children }: { label: string; children: ReactNode }) {
+function RowMenu({
+  label,
+  children,
+  openRequest = 0,
+}: {
+  label: string;
+  children: ReactNode;
+  /** Bump to open the menu from outside (right-click on the row). */
+  openRequest?: number;
+}) {
   const [armed, setArmed] = useState(false);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (openRequest > 0) {
+      setArmed(true);
+      setOpen(true);
+    }
+  }, [openRequest]);
   const buttonClass =
     "opacity-40 group-hover:opacity-100 focus-visible:opacity-100 data-popup-open:opacity-100";
 

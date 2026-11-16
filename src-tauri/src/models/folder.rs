@@ -14,3 +14,12 @@ pub struct Folder {
     pub created_at: String,
     pub updated_at: String,
 }
+
+/// One "problem is in folder" link. Only links to non-trashed problems are
+/// returned, so the export picker never offers something that's in the trash.
+#[derive(Debug, Clone, FromRow, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FolderLink {
+    pub folder_id: String,
+    pub problem_id: String,
+}

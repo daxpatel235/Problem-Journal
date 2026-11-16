@@ -29,4 +29,9 @@ tokio = { version = "1", features = ["full"] }
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1", features = ["v4", "serde"] }
 dirs = "5"
+# PDF export engine
+pdf-writer = "0.15"   # low-level PDF object writer
+rustybuzz = "0.20"    # text shaping (kerning, Hindi conjuncts); re-exports ttf-parser
+rayon = "1.10"        # lays problems out on several cores
+miniz_oxide = "0.8"   # Flate compression for page and font streams
 

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useProblemStore } from "@/stores/problemStore";
 import { useFolderStore } from "@/stores/folderStore";
+import { useExportStore } from "@/stores/exportStore";
 import { useUiStore } from "@/stores/uiStore";
 import { useZoom } from "@/hooks/useZoom";
 
@@ -24,11 +25,19 @@ export function useKeyboardShortcuts() {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const mod = event.ctrlKey || event.metaKey;
-      const inFolders = useUiStore.getState().view === "folders";
+      const view = useUiStore.getState().view;
+      const inFolders = view === "folders";
       const folderState = useFolderStore.getState();
       // In the folder view the editor is only on screen while a problem is
-      // open full screen; editor shortcuts must not act on a hidden problem.
-      const editorVisible = !inFolders || folderState.focusOpen;
+      // open full screen, and the export page has none; editor shortcuts must
+      // not act on a hidden problem.
+      const editorVisible = view === "timeline" || (inFolders && folderState.focusOpen);
+
+      if (mod && event.shiftKey && !event.altKey && event.key.toLowerCase() === "e") {
+        event.preventDefault();
+        void useExportStore.getState().openExport();
+        return;
+      }
 
       if (!mod) {
         const isBack =

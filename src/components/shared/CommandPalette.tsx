@@ -9,6 +9,7 @@ import {
   PlusIcon,
   SearchIcon,
   SettingsIcon,
+  ShareIcon,
   StarIcon,
   SunIcon,
   Trash2Icon,
@@ -23,7 +24,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
+  CommandShortcut,
 } from "@/components/ui/command";
+import { useExportStore } from "@/stores/exportStore";
 import { useZoom } from "@/hooks/useZoom";
 import { useProblemStore } from "@/stores/problemStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -40,6 +43,7 @@ export function CommandPalette() {
   const openSettings = useUiStore((s) => s.openSettings);
   const requestConfirm = useUiStore((s) => s.requestConfirm);
   const setView = useUiStore((s) => s.setView);
+  const openExport = useExportStore((s) => s.openExport);
 
   const problems = useProblemStore((s) => s.problems);
   const selectedId = useProblemStore((s) => s.selectedId);
@@ -86,8 +90,25 @@ export function CommandPalette() {
             <SearchIcon />
             Search problems
           </CommandItem>
+          <CommandItem
+            value="export pdf share download save"
+            onSelect={() => run(() => void openExport())}
+          >
+            <ShareIcon />
+            Export…
+            <CommandShortcut>Ctrl+Shift+E</CommandShortcut>
+          </CommandItem>
           {selectedId && selectedProblem && (
             <>
+              <CommandItem
+                value="export current problem pdf"
+                onSelect={() =>
+                  run(() => void openExport({ mode: "one", problemIds: [selectedId] }))
+                }
+              >
+                <ShareIcon />
+                Export current problem as PDF
+              </CommandItem>
               <CommandItem
                 value="favorite star current"
                 onSelect={() => run(() => void toggleFavorite(selectedId))}
